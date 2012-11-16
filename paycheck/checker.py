@@ -5,12 +5,41 @@ from functools import partial
 from itertools import izip, izip_longest, islice, repeat
 import sys
 from types import FunctionType
+from generator import custom_generators, PayCheckGenerator
+from new import classobj
+
+
+class PaycheckTypeException(Exception):
+    ''' raised when an attempt to register an extant type '''
+    pass
+
 
 def with_checker(*args, **keywords):
     if len(args) == 1 and isinstance(args[0],FunctionType):
         return Checker()(args[0])
     else:
         return Checker(*args, **keywords)
+
+
+def register_type(name, func):
+    '''
+    dynamically add a new generated type
+
+    func must be a callable which requires zero arguments
+    and returns a value of the type we want.
+
+    An error is raised if the name is already registered.
+    '''
+    if name in custom_generators:
+        raise PaycheckTypeException('{} already registered!'.format(name))
+
+    def __next__(self, *args, **kargs):
+        ''' wrapped func as a PayCheckGenerator.__next__ method '''
+        return func(*args, **kargs)
+    new_class = classobj('{}_PaycheckGenerator'.format(name),
+                         (PayCheckGenerator,), {'__next__': __next__})
+    custom_generators[name] = new_class
+
 
 class Checker(object):
     

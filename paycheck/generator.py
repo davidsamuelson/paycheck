@@ -51,7 +51,9 @@ class PayCheckGenerator(object):
     @classmethod
     def get(cls, t_def):
         try:
-            if isinstance(t_def, type):
+            if isinstance(t_def, str):
+                return custom_generators[t_def]()
+            elif isinstance(t_def, type):
                 return scalar_generators[t_def]()
             else:
                 return container_generators[type(t_def)](t_def)
@@ -203,6 +205,9 @@ container_generators = {
     tuple:   TupleGenerator,
   }
 
+
+custom_generators = {}
+
 # ------------------------------------------------------------------------------
 # Miscellaneous generators
 # ------------------------------------------------------------------------------
@@ -250,6 +255,7 @@ __all__ = [
     'TupleGenerator',
     'scalar_generators',
     'container_generators',
+    'custom_generators',
     'ChoiceGenerator',
     'choiceof',
     'oneof',

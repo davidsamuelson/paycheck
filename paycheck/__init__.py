@@ -1,2 +1,2 @@
-from paycheck.checker import with_checker
+from paycheck.checker import with_checker, register_type
 from paycheck.generator import irange, frange, positive_float, non_negative_float, unit_interval_float, choiceof, oneof
